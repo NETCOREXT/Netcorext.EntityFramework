@@ -47,4 +47,32 @@ public static class ApplicationBuilderExtension
 
         context.Master.Database.Migrate();
     }
+    public static void WarmupDbContext(this IApplicationBuilder builder)
+    {
+        Task.Run(async () =>
+                 {
+                     using var serviceScope = builder.ApplicationServices.CreateScope();
+
+                     var context = serviceScope.ServiceProvider.GetRequiredService<DatabaseContextAdapter>();
+
+                     try
+                     {
+                         _ = context.Master.Model;
+                         _ = context.Slave.Model;
+
+                         await context.Master.Database.OpenConnectionAsync();
+                         await context.Slave.Database.OpenConnectionAsync();
+
+                         await context.Master.Database.ExecuteSqlRawAsync("SELECT 1");
+                         await context.Slave.Database.ExecuteSqlRawAsync("SELECT 1");
+
+                         await context.Master.Database.CloseConnectionAsync();
+                         await context.Slave.Database.CloseConnectionAsync();
+                     }
+                     catch (Exception ex)
+                     {
+                         Console.Error.WriteLine(ex);
+                     }
+                 });
+    }
 }
