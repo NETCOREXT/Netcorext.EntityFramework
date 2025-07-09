@@ -61,7 +61,7 @@ public class SlowCommandLoggingInterceptor : DbCommandInterceptor
     {
         if (duration.TotalMilliseconds > _slowCommandLoggingThreshold)
         {
-            _logger.LogWarning("Slow DbCommand ({Duration})\n{CommandText} ()", duration, commandText);
+            _logger.LogWarning("Detected slow SQL command: ({Duration})\n{CommandText} ()", duration, commandText);
         }
     }
 }
