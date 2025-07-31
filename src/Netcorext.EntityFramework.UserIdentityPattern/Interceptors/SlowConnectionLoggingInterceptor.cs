@@ -31,7 +31,7 @@ public class SlowConnectionLoggingInterceptor : DbConnectionInterceptor
     {
         if (duration.TotalMilliseconds > _slowConnectionLoggingThreshold)
         {
-            _logger.LogWarning("Detected slow database connection: DataSource={dataSource}, Database={database} ({Duration})", duration, dataSource, database);
+            _logger.LogWarning("Detected slow database connection: DataSource={dataSource}, Database={database} ({Duration})", dataSource, database, duration);
         }
     }
 }
